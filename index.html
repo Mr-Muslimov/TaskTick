@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#4772fa" />
+  <meta name="description" content="TaskTick — задачи, списки, календарь, привычки и фокус-таймер. Современный менеджер задач." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="TaskTick" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>TaskTick — Задачи и привычки</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app">
+
+    <!-- ===== Sidebar ===== -->
+    <aside class="sidebar" id="sidebar" aria-label="Навигация">
+      <div class="sidebar-top">
+        <a class="logo" href="#today" id="logo-home">
+          <span class="logo-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" fill="currentColor"/></svg>
+          </span>
+          <span class="logo-text">TaskTick</span>
+        </a>
+        <button class="icon-btn sidebar-close" id="sidebar-close" aria-label="Закрыть меню">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z" fill="currentColor"/></svg>
+        </button>
+      </div>
+
+      <nav class="smart-lists" aria-label="Умные списки">
+        <a class="nav-item is-active" data-view="today" data-drop-quick="today" href="#today">
+          <span class="nav-icon" style="--c:#4772fa"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" fill="currentColor"/></svg></span>
+          <span class="nav-label">Сегодня</span>
+          <span class="nav-count" data-count="today">0</span>
+        </a>
+        <a class="nav-item" data-view="tomorrow" data-drop-quick="tomorrow" href="#tomorrow">
+          <span class="nav-icon" style="--c:#f5a623"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" fill="currentColor"/></svg></span>
+          <span class="nav-label">Завтра</span>
+          <span class="nav-count" data-count="tomorrow">0</span>
+        </a>
+        <a class="nav-item" data-view="next7" data-drop-quick="nextweek" href="#next7">
+          <span class="nav-icon" style="--c:#7c5cff"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" fill="currentColor"/></svg></span>
+          <span class="nav-label">Следующие 7 дней</span>
+          <span class="nav-count" data-count="next7">0</span>
+        </a>
+        <a class="nav-item" data-view="calendar" href="#calendar">
+          <span class="nav-icon" style="--c:#2e7cf6"><svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V2zm12 8H5v10h14V10zM5 8V6h2v1h2V6h6v1h2V6h2v2H5z" fill="currentColor"/></svg></span>
+          <span class="nav-label">Календарь</span>
+        </a>
+        <a class="nav-item" data-view="inbox" data-drop-list="" href="#inbox">
+          <span class="nav-icon" style="--c:#5f6b8a"><svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 2v2h-7V5h7zm-9 0v2H5V5h5zm-5 4h7v2H5V9zm9 0h5v2h-5V9zm-9 4h14v6H5v-6z" fill="currentColor"/></svg></span>
+          <span class="nav-label">Входящие</span>
+          <span class="nav-count" data-count="inbox">0</span>
+        </a>
+        <a class="nav-item" data-view="all" href="#all">
+          <span class="nav-icon" style="--c:#4772fa"><svg viewBox="0 0 24 24"><path d="M4 5h16v2H4V5zm0 6h16v2H4v-2zm0 6h10v2H4v-2z" fill="currentColor"/></svg></span>
+          <span class="nav-label">Все задачи</span>
+        </a>
+        <a class="nav-item" data-view="completed" href="#completed">
+          <span class="nav-icon" style="--c:#3bb96f"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.2 14.2-4.2-4.2 1.4-1.4 2.8 2.8 6.8-6.8 1.4 1.4-8.2 8.2z" fill="currentColor"/></svg></span>
+          <span class="nav-label">Завершённые</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-scroll">
+        <div class="section mini-cal-section">
+          <div id="mini-cal"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <span class="section-title">Списки</span>
+            <button class="icon-btn add-list" id="add-list-btn" aria-label="Добавить список" title="Добавить список">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <ul class="nav-group" id="lists-container"></ul>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <span class="section-title">Теги</span>
+            <button class="icon-btn" id="add-tag-btn" aria-label="Добавить тег" title="Добавить тег">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <ul class="nav-group" id="tags-container"></ul>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <span class="section-title">Привычки</span>
+            <button class="icon-btn" id="add-habit-btn" aria-label="Добавить привычку" title="Добавить привычку">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <ul class="nav-group" id="habits-nav"></ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <a class="nav-item" data-view="focus" href="#focus">
+          <span class="nav-icon" style="--c:#ff6b6b"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 5h2v5h4v2h-6V7z" fill="currentColor"/></svg></span>
+          <span class="nav-label">Фокус</span>
+        </a>
+        <button class="nav-item theme-toggle" id="theme-toggle" type="button">
+          <span class="nav-icon" id="theme-icon"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.5-.05-1-.13-1.5a7 7 0 0 1-9.37-9.37A9 9 0 0 0 12 3z" fill="currentColor"/></svg></span>
+          <span class="nav-label" id="theme-label">Тёмная тема</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- ===== Main ===== -->
+    <main class="main">
+      <header class="main-header">
+        <button class="icon-btn menu-btn" id="menu-btn" aria-label="Открыть меню">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z" fill="currentColor"/></svg>
+        </button>
+        <h1 class="view-title" id="view-title">Сегодня</h1>
+        <div class="header-actions">
+          <button class="icon-btn" id="stats-btn" aria-label="Статистика" title="Статистика">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 20h16v2H2V2h2v18zm3-3V9h3v8H7zm5 0V5h3v12h-3zm5 0v-6h3v6h-3z" fill="currentColor"/></svg>
+          </button>
+          <button class="icon-btn" id="view-mode-btn" aria-label="Вид: список или доска" title="Список / Доска">
+            <svg viewBox="0 0 24 24" width="20" height="20" id="view-mode-icon"><path d="M3 5h5v14H3V5zm6.5 0h5v14h-5V5zM15 5h6v14h-6V5z" fill="currentColor"/></svg>
+          </button>
+          <button class="icon-btn" id="select-btn" aria-label="Выделить задачи" title="Множественный выбор">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 6h2v2H4V6zm0 5h2v2H4v-2zm0 5h2v2H4v-2zM8 6h12v2H8V6zm0 5h12v2H8v-2zm0 5h12v2H8v-2z" fill="currentColor"/></svg>
+          </button>
+          <div class="search-box" id="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z" fill="currentColor"/></svg>
+            <input type="search" id="search-input" placeholder="Поиск" autocomplete="off" />
+          </div>
+          <button class="icon-btn" id="sort-btn" aria-label="Сортировка" title="Сортировка">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z" fill="currentColor"/></svg>
+          </button>
+          <div class="sort-menu hidden" id="sort-menu">
+            <button data-sort="smart">Умная сортировка</button>
+            <button data-sort="date">По дате</button>
+            <button data-sort="priority">По приоритету</button>
+            <button data-sort="title">По названию</button>
+            <button data-sort="manual">Вручную</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="content" id="content">
+        <section class="task-pane" id="task-pane">
+          <div class="task-list" id="task-list"></div>
+          <div class="board hidden" id="board"></div>
+          <div class="empty-state hidden" id="empty-state">
+            <div class="empty-emoji" id="empty-emoji">🎉</div>
+            <h3 id="empty-title">Всё выполнено</h3>
+            <p id="empty-sub">Отличная работа! Новые задачи появятся здесь.</p>
+          </div>
+        </section>
+
+        <!-- Calendar pane -->
+        <section class="calendar-pane hidden" id="calendar-pane">
+          <div class="calendar">
+            <div class="calendar-head">
+              <button class="icon-btn" id="cal-prev" aria-label="Назад"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" fill="currentColor"/></svg></button>
+              <h2 id="cal-title">Январь 2025</h2>
+              <button class="icon-btn" id="cal-next" aria-label="Вперёд"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" fill="currentColor"/></svg></button>
+              <button class="btn btn-ghost" id="cal-today">Сегодня</button>
+              <div class="seg" id="cal-view-switch" role="tablist" aria-label="Вид календаря">
+                <button type="button" data-calview="day" role="tab">День</button>
+                <button type="button" data-calview="3day" role="tab">3 дня</button>
+                <button type="button" data-calview="week" role="tab">Неделя</button>
+                <button type="button" data-calview="month" class="is-active" role="tab">Месяц</button>
+              </div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </div>
+          <div class="calendar-day-tasks" id="calendar-day-tasks">
+            <h3 id="calendar-day-title">Выберите день</h3>
+            <div id="calendar-day-list"></div>
+          </div>
+        </section>
+
+        <!-- Habits pane -->
+        <section class="habits-pane hidden" id="habits-pane">
+          <div class="habits-header">
+            <div>
+              <h2>Привычки</h2>
+              <p class="muted" id="habits-summary">Отмечайте выполнение каждый день и растите серию.</p>
+            </div>
+            <button class="btn btn-primary" id="habits-add-top">+ Новая привычка</button>
+          </div>
+          <div class="habits-weeknav" id="habits-weeknav"></div>
+          <div class="habits-grid" id="habits-grid"></div>
+        </section>
+
+        <!-- Focus pane -->
+        <section class="focus-pane hidden" id="focus-pane">
+          <div class="focus">
+            <h2>Фокус</h2>
+            <p class="muted">Сконцентрируйтесь на одной задаче за раз.</p>
+            <div class="focus-task" id="focus-task">Выберите задачу для фокуса</div>
+            <div class="timer-ring" id="timer-ring">
+              <svg viewBox="0 0 240 240" width="240" height="240">
+                <circle class="ring-bg" cx="120" cy="120" r="104" />
+                <circle class="ring-fg" id="ring-fg" cx="120" cy="120" r="104" />
+              </svg>
+              <div class="timer-center">
+                <div class="timer-time" id="timer-time">25:00</div>
+                <div class="timer-mode" id="timer-mode">Фокус</div>
+              </div>
+            </div>
+            <div class="timer-modes" id="timer-modes">
+              <button class="chip is-active" data-duration="25">Фокус</button>
+              <button class="chip" data-duration="5">Короткий отдых</button>
+              <button class="chip" data-duration="15">Длинный отдых</button>
+            </div>
+            <div class="timer-controls">
+              <button class="btn btn-primary btn-lg" id="timer-toggle">Старт</button>
+              <button class="btn btn-ghost btn-lg" id="timer-reset">Сброс</button>
+            </div>
+            <p class="muted" id="timer-stats"></p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Quick add -->
+      <div class="quick-add-wrap">
+        <div class="quick-add" id="quick-add">
+          <svg class="qa-plus" viewBox="0 0 24 24" width="20" height="20"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+          <input type="text" id="quick-add-input" placeholder="Добавить задачу, например «Купить молоко завтра 9:00»" autocomplete="off" />
+          <div class="qa-tools">
+            <button class="icon-btn qa-date" id="qa-date" title="Дата" aria-label="Дата"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" fill="currentColor"/></svg></button>
+            <button class="icon-btn qa-prio" id="qa-prio" title="Приоритет" aria-label="Приоритет"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M3 13h11v2H3v-2zm0 5h11v2H3v-2zm0-10h11v2H3V8zm0 5h11v2H3v-2zM16 4l6 8h-12l6-8z" fill="currentColor"/></svg></button>
+            <button class="icon-btn" id="qa-submit" title="Добавить" aria-label="Добавить задачу"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" fill="currentColor"/></svg></button>
+          </div>
+          <div class="qa-popover hidden" id="qa-date-pop">
+            <button data-quick="today">Сегодня</button>
+            <button data-quick="tomorrow">Завтра</button>
+            <button data-quick="next-week">След. неделя</button>
+            <button data-quick="none">Без даты</button>
+            <input type="date" id="qa-date-input" />
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ===== Task detail drawer ===== -->
+    <aside class="detail" id="detail" aria-label="Детали задачи">
+      <div class="detail-header">
+        <button class="icon-btn" id="detail-close" aria-label="Закрыть"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z" fill="currentColor"/></svg></button>
+        <div class="detail-actions">
+          <button class="icon-btn" id="detail-delete" aria-label="Удалить" title="Удалить"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/></svg></button>
+        </div>
+      </div>
+      <div class="detail-body" id="detail-body"></div>
+    </aside>
+    <div class="detail-backdrop" id="detail-backdrop"></div>
+
+    <!-- ===== Bulk actions bar ===== -->
+    <div class="bulk-bar hidden" id="bulk-bar">
+      <span class="bulk-count" id="bulk-count">Выбрано: 0</span>
+      <div class="bulk-actions">
+        <button class="btn btn-ghost" data-bulk="complete">Выполнить</button>
+        <button class="btn btn-ghost" data-bulk="date">Дата</button>
+        <button class="btn btn-ghost" data-bulk="list">Список</button>
+        <button class="btn btn-ghost" data-bulk="priority">Приоритет</button>
+        <button class="btn btn-ghost bulk-danger" data-bulk="delete">Удалить</button>
+        <button class="btn btn-ghost" data-bulk="cancel">Отмена</button>
+      </div>
+    </div>
+
+    <!-- ===== Modal ===== -->
+    <div class="modal hidden" id="modal">
+      <div class="modal-backdrop" id="modal-backdrop"></div>
+      <div class="modal-card" id="modal-card"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
