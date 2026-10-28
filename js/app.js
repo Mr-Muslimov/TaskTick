@@ -400,8 +400,9 @@
     var pr = PRIORITIES[task.priority || 0];
     var sel = state.selectMode;
     var on = isSelected(task.id);
-    var accent = task.color ? ' style="box-shadow:inset 3px 0 0 ' + esc(task.color) + '"' : "";
-    return '<div class="task' + (task.completed ? " done" : "") + (on ? " selected" : "") + '" data-id="' + task.id + '" draggable="true"' + accent + '>' +
+    var cls = "task" + (task.completed ? " done" : "") + (on ? " selected" : "") + (task.color ? " has-color" : "");
+    var st = task.color ? ' style="--tc:' + esc(task.color) + '"' : "";
+    return '<div class="' + cls + '" data-id="' + task.id + '" draggable="true"' + st + '>' +
       (sel
         ? '<span class="task-select' + (on ? " on" : "") + '" data-action="select">' + (on ? Icons.check(12) : "") + '</span>'
         : '<span class="task-drag-handle" data-action="drag" title="Перетащить">' + Icons.drag(16) + '</span>') +
@@ -506,8 +507,9 @@
       var cards = colTasks.map(function (t) {
         var list = t.listId ? Store.getList(t.listId) : null;
         var subDone = (t.subtasks || []).filter(function (s) { return s.completed; }).length;
-        var bcAccent = t.color ? ' style="box-shadow:inset 3px 0 0 ' + esc(t.color) + '"' : "";
-        return '<div class="board-card' + (t.completed ? " done" : "") + '" data-id="' + t.id + '" draggable="true"' + bcAccent + '>' +
+        var bcCls = "board-card" + (t.completed ? " done" : "") + (t.color ? " has-color" : "");
+        var bcSt = t.color ? ' style="--tc:' + esc(t.color) + '"' : "";
+        return '<div class="' + bcCls + '" data-id="' + t.id + '" draggable="true"' + bcSt + '>' +
           '<div class="bc-title">' + esc(t.title) + '</div>' +
           '<div class="bc-meta">' +
             (t.priority ? '<span class="meta-chip" style="color:' + PRIORITIES[t.priority].color + '">' + Icons.flag(12) + '</span>' : "") +
@@ -2716,6 +2718,22 @@
       : "Добавить задачу, например «Купить молоко завтра 9:00»";
   }
 
+  // Если браузер проигнорировал viewport и отрисовал страницу шире экрана —
+  // переприменяем meta, чтобы масштаб был ровно 100%.
+  function fixViewportIfNeeded() {
+    try {
+      var m = document.querySelector('meta[name="viewport"]');
+      if (!m) return;
+      var iw = window.innerWidth || 0;
+      var sw = (window.screen && window.screen.width) || 0;
+      var zoomedOut = !!(window.visualViewport && window.visualViewport.scale < 0.95);
+      var tooWide = sw >= 280 && sw <= 560 && iw > sw + 120;
+      if (zoomedOut || tooWide) {
+        m.setAttribute("content", "width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover");
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   function openDateAddModal(dayOverride) {
     var ds = dayOverride || state.selectedDay || Store.todayStr();
     openModal('<h3>Новая задача на ' + esc(Store.formatDate(ds)) + '</h3>' +
@@ -2759,6 +2777,9 @@
     try { state.lastNavKey = location.hash || "#today"; } catch (e) { state.lastNavKey = "#today"; }
     updateQuickAddPlaceholder();
     renderAll();
+    fixViewportIfNeeded();
+    setTimeout(fixViewportIfNeeded, 300);
+    window.addEventListener("orientationchange", function () { setTimeout(fixViewportIfNeeded, 250); });
     $("#quick-add-input").focus();
 
     // напоминания: проверяем раз в 30 секунд
