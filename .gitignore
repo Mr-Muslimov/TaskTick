@@ -1,0 +1,36 @@
+﻿# OS / редакторы
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# Node (если появится обвязка для Capacitor)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# Capacitor / Android
+android/
+ios/
+.capacitor/
+
+# Артефакты сборки
+dist/
+build/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Временные и тестовые файлы
+_qa/
+_shot.html
+_wrap.html
+_load.html
+*.log
+

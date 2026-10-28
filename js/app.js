@@ -75,6 +75,7 @@
     habitWeekStart: null,
     lastNavKey: null,
     renderLimit: 150,
+    daySheet: false,
     selectedDay: null,
     quickDate: null,
     quickPriority: 0,
@@ -128,6 +129,7 @@
     state.selectMode = false;
     state.habitWeekStart = null;
     state.renderLimit = 150;
+    state.daySheet = false;
     clearSelection();
     var si = $("#search-input");
     if (si) si.value = "";
@@ -590,18 +592,24 @@
     var first = new Date(y, m, 1);
     var startOffset = (first.getDay() + 6) % 7;
     var daysInMonth = new Date(y, m + 1, 0).getDate();
-    var html = '<div class="cal-month">';
+    var weeks = Math.ceil((startOffset + daysInMonth) / 7);
+    // на телефоне ячейка ~46 px — текстовые чипы нечитаемы, показываем точки
+    var compact = (window.innerWidth || 0) <= 520;
+    var html = '<div class="cal-month" data-weeks="' + weeks + '">';
     html += Store.WEEKDAYS.map(function (w) { return '<div class="cal-weekday">' + w + '</div>'; }).join("");
     for (var i = 0; i < startOffset; i++) html += '<div class="cal-day other-month"></div>';
     for (var d = 1; d <= daysInMonth; d++) {
       var ds = y + "-" + pad2(m + 1) + "-" + pad2(d);
       var dayTasks = byDay[ds] || [];
       var cls = "cal-day" + (ds === today ? " today" : "") + (state.selectedDay === ds ? " is-selected" : "");
+      var eventsHtml = compact
+        ? dayTasks.slice(0, 3).map(function (t) { return '<span class="cal-dot" style="background:' + taskColor(t) + '"></span>'; }).join("")
+        : dayTasks.slice(0, 3).map(function (t) { return calChip(t, true); }).join("");
       html += '<div class="' + cls + '" data-day="' + ds + '" data-drop-day="' + ds + '">' +
         '<div class="cal-day-head"><span class="cal-day-num">' + d + '</span>' +
         '<button class="cal-day-add" data-action="day-add" data-day="' + ds + '" title="Добавить задачу">+</button></div>' +
-        '<div class="cal-day-events">' + dayTasks.slice(0, 3).map(function (t) { return calChip(t, true); }).join("") + '</div>' +
-        (dayTasks.length > 3 ? '<div class="cal-more">+' + (dayTasks.length - 3) + ' ещё</div>' : "") +
+        '<div class="cal-day-events">' + eventsHtml + '</div>' +
+        (dayTasks.length > 3 ? '<div class="cal-more">+' + (dayTasks.length - 3) + '</div>' : "") +
         '</div>';
     }
     html += '</div>';
@@ -652,7 +660,11 @@
     var byDay = tasksByDay();
     var today = Store.todayStr();
 
-    $$("#cal-view-switch button").forEach(function (b) {
+    // синхронизируем режимы (полноэкранный календарь + панель дня)
+    document.body.classList.toggle("cal-mode", state.view === "calendar");
+    document.body.classList.toggle("day-sheet", state.view === "calendar" && !!state.daySheet);
+
+    $$("#cal-view-switch button, #side-cal-switch button").forEach(function (b) {
       b.classList.toggle("is-active", b.getAttribute("data-calview") === view);
     });
 
@@ -673,7 +685,8 @@
           (dd.getFullYear() !== new Date().getFullYear() ? " " + dd.getFullYear() : "") +
           ", " + dd.toLocaleDateString("ru-RU", { weekday: "long" });
       } else {
-        $("#cal-title").textContent = (view === "week" ? "Неделя · " : "") + rangeTitle(days);
+        var compactTitle = (window.innerWidth || 0) <= 520;
+        $("#cal-title").textContent = (view === "week" && !compactTitle ? "Неделя · " : "") + rangeTitle(days);
       }
       grid.innerHTML = timeGridHtml(days, byDay, today);
     }
@@ -2221,6 +2234,9 @@
     // доска и групповой выбор применимы только к спискам задач
     $("#view-mode-btn").classList.toggle("hidden", isCalendar || isHabits || isFocus);
     $("#select-btn").classList.toggle("hidden", isCalendar || isHabits || isFocus);
+    // полноэкранный календарь на мобильных
+    document.body.classList.toggle("cal-mode", isCalendar);
+    document.body.classList.toggle("day-sheet", isCalendar && !!state.daySheet);
 
     if (isCalendar) renderCalendar();
     else if (isHabits) renderHabits();
@@ -2403,6 +2419,29 @@
     $("#cal-prev").addEventListener("click", function () { calShift(-1); });
     $("#cal-next").addEventListener("click", function () { calShift(1); });
     $("#cal-today").addEventListener("click", function () { setCalAnchor(Store.todayStr()); renderCalendar(); });
+
+    // мобильный полноэкранный календарь: бургер и «+» в круге
+    $("#cal-menu-btn").addEventListener("click", function () {
+      $("#sidebar").classList.add("open");
+      $("#sidebar-backdrop").classList.add("show");
+    });
+    $("#cal-fab").addEventListener("click", function () { addTaskFromFab(); });
+    $("#sheet-backdrop").addEventListener("click", function () {
+      state.daySheet = false;
+      renderCalendar();
+    });
+
+    // переключатель вида календаря в сайдбаре (мобильный)
+    $("#side-cal-switch").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-calview]");
+      if (!b) return;
+      state.calView = b.getAttribute("data-calview");
+      Store.getSettings().calendarView = state.calView;
+      Store.saveSettings();
+      $("#sidebar").classList.remove("open");
+      $("#sidebar-backdrop").classList.remove("show");
+      navigate("#calendar");
+    });
     $("#calendar-grid").addEventListener("click", function (e) {
       var addBtn = e.target.closest("[data-action='day-add']");
       if (addBtn) { e.stopPropagation(); openDateAddModal(addBtn.getAttribute("data-day")); return; }
@@ -2421,10 +2460,12 @@
       var allDay = e.target.closest(".cal-tg-allday-cell[data-drop-day]");
       if (allDay) { createTaskAt(allDay.getAttribute("data-drop-day"), null); return; }
 
-      // день месяца: если пусто — создать, если есть задачи — выбрать
+      // день месяца: с задачами — открыть панель дня, пустой — создать задачу
       var cell = e.target.closest(".cal-day[data-drop-day]");
       if (cell) {
-        if (cell.querySelector(".cal-chip") || cell.classList.contains("other-month")) {
+        var hasTasks = !!cell.querySelector(".cal-chip, .cal-dot");
+        if (hasTasks || cell.classList.contains("other-month")) {
+          state.daySheet = true;
           setCalAnchor(cell.getAttribute("data-drop-day"));
           renderCalendar();
         } else {
@@ -2622,7 +2663,7 @@
     // Хэш-навигация (для настоящего браузера: кнопки «назад/вперёд», прямые ссылки)
     window.addEventListener("hashchange", function () {
       var h = location.hash || "#today";
-      // если этот переход мы уже обработали в navigate() — ниего не трогаем,
+      // если этот переход мы уже обработали в navigate() — ничего не трогаем,
       // иначе открытая панель задач и строка поиска будут сбрасываться
       if (h === state.lastNavKey) return;
       state.lastNavKey = h;
@@ -2630,12 +2671,15 @@
       closeDetail();
       renderAll();
     });
+
+    // пересчёт плейсхолдера при изменении ширины (поворот экрана)
+    window.addEventListener("resize", debounce(updateQuickAddPlaceholder, 200));
   }
 
   // Создание задачи тапом по календарю: сразу открываем редактор
-  function createTaskAt(dateStr, hour) {
+  function createTaskAt(dateStr, hour, exactTime) {
     if (!dateStr) return null;
-    var time = hour == null ? null : pad2(hour) + ":00";
+    var time = exactTime || (hour == null ? null : pad2(hour) + ":00");
     var task = Store.addTask({
       title: "",
       dueDate: dateStr,
@@ -2649,6 +2693,27 @@
     if (ti) { try { ti.focus(); } catch (e) { /* ignore */ } }
     showToast("Задача на " + Store.formatDate(dateStr) + (time ? ", " + time : "") + " — введите название");
     return task;
+  }
+
+  // «+» в календаре: задача на ближайшие полчаса выбранного дня
+  function addTaskFromFab() {
+    var day = state.selectedDay || Store.todayStr();
+    var now = new Date();
+    var mins = now.getHours() * 60 + now.getMinutes();
+    var rounded = Math.ceil((mins + 1) / 30) * 30;
+    if (rounded >= 24 * 60) { rounded = 0; day = Store.addDaysStr(day, 1); }
+    var time = pad2(Math.floor(rounded / 60)) + ":" + pad2(rounded % 60);
+    createTaskAt(day, null, time);
+  }
+
+  // короткий плейсхолдер на узких экранах (иначе он обрезается)
+  function updateQuickAddPlaceholder() {
+    var inp = $("#quick-add-input");
+    if (!inp) return;
+    var narrow = window.innerWidth <= 640;
+    inp.placeholder = narrow
+      ? "Добавить задачу…"
+      : "Добавить задачу, например «Купить молоко завтра 9:00»";
   }
 
   function openDateAddModal(dayOverride) {
@@ -2692,6 +2757,7 @@
     bindEvents();
     parseHash();
     try { state.lastNavKey = location.hash || "#today"; } catch (e) { state.lastNavKey = "#today"; }
+    updateQuickAddPlaceholder();
     renderAll();
     $("#quick-add-input").focus();
 
@@ -2704,3 +2770,4 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
+

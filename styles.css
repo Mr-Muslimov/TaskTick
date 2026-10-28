@@ -1078,3 +1078,195 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   .board { max-width: 720px; }
   .calendar { max-width: 760px; }
 }
+
+/* ============================================================
+   Кнопки шапки: больше воздуха у краёв
+   ============================================================ */
+@media (max-width: 820px) {
+  .main-header { padding: 10px 16px; gap: 8px; }
+  .header-actions { gap: 6px; }
+  .view-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+/* ============================================================
+   Полноэкранный календарь на телефоне (как Google Календарь)
+   Включается классом body.cal-mode, когда открыт вид «Календарь».
+   ============================================================ */
+.cal-menu-btn { display: none; }
+.cal-fab { display: none; }
+
+@media (max-width: 820px) {
+  body.cal-mode .main-header { display: none; }
+  body.cal-mode .quick-add-wrap { display: none; }
+
+  body.cal-mode .calendar-pane {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    gap: 0;
+  }
+  body.cal-mode .calendar {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    max-width: none;
+  }
+
+  /* верхняя панель календаря */
+  body.cal-mode .calendar-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: calc(6px + env(safe-area-inset-top)) 8px 6px;
+    margin: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 6;
+  }
+  body.cal-mode .cal-menu-btn { display: inline-flex; flex: 0 0 auto; }
+  body.cal-mode .calendar-head h2 {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body.cal-mode #cal-prev,
+  body.cal-mode #cal-next { flex: 0 0 auto; }
+  body.cal-mode #cal-today { flex: 0 0 auto; padding: 7px 12px; font-size: 13px; border-radius: 9px; }
+  body.cal-mode #cal-view-switch {
+    order: 10;
+    flex: 1 1 100%;
+    width: 100%;
+    margin: 4px 0 0;
+  }
+  body.cal-mode #cal-view-switch button { flex: 1 1 0; text-align: center; }
+
+  body.cal-mode .calendar-day-tasks { display: none; }
+
+  body.cal-mode .calendar-grid {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 6px 6px calc(84px + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* месяц на весь экран */
+  body.cal-mode .cal-month { height: 100%; min-width: 0; gap: 4px; }
+  body.cal-mode .cal-month[data-weeks="4"] { grid-template-rows: auto repeat(4, minmax(0, 1fr)); }
+  body.cal-mode .cal-month[data-weeks="5"] { grid-template-rows: auto repeat(5, minmax(0, 1fr)); }
+  body.cal-mode .cal-month[data-weeks="6"] { grid-template-rows: auto repeat(6, minmax(0, 1fr)); }
+  body.cal-mode .cal-day { min-height: 0; padding: 4px; border-radius: 8px; }
+  body.cal-mode .cal-day-num { font-size: 12px; }
+  body.cal-mode .cal-day-events { gap: 2px; }
+  body.cal-mode .cal-chip { font-size: 10.5px; padding: 1px 4px; border-left-width: 2px; }
+
+  /* неделя / день — от края до края */
+  body.cal-mode .cal-timegrid {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    min-width: 0;
+  }
+  body.cal-mode .cal-timegrid.days-7,
+  body.cal-mode .cal-timegrid.days-3,
+  body.cal-mode .cal-timegrid.days-1 { min-width: 0; }
+  body.cal-mode .cal-tg-body { max-height: none; }
+
+  /* «+» в круге */
+  body.cal-mode .cal-fab {
+    display: flex;
+    position: fixed;
+    right: 16px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(71, 114, 250, .45);
+    z-index: 44;
+    transition: transform .12s ease;
+  }
+  body.cal-mode .cal-fab:active { transform: scale(.92); }
+}
+
+/* ---------- переключатель вида календаря в сайдбаре (только мобильные) ---------- */
+.cal-switch-section { display: none; }
+.side-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 10px; }
+.side-seg button {
+  padding: 9px 6px; border-radius: 9px; font-size: 13px; font-weight: 500;
+  color: var(--text-2); background: var(--card); border: 1px solid var(--border);
+}
+.side-seg button.is-active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+@media (max-width: 820px) {
+  .cal-switch-section { display: block; }
+  /* в полноэкранном календаре вкладки живут в сайдбаре — шапка остаётся в одну строку */
+  body.cal-mode #cal-view-switch { display: none; }
+
+  /* неделя на телефоне прокручивается по горизонтали, как в Google Календаре */
+  body.cal-mode .cal-timegrid.days-7 { min-width: 560px; }
+  body.cal-mode .cal-timegrid.days-3 { min-width: 330px; }
+  body.cal-mode .cal-timegrid.days-1 { min-width: 0; }
+}
+
+
+
+/* ---------- выдвижная панель дня на мобильных ---------- */
+.sheet-backdrop { display: none; }
+
+@media (max-width: 820px) {
+  body.cal-mode.day-sheet .sheet-backdrop {
+    display: block;
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, .35);
+    z-index: 45;
+  }
+  body.cal-mode.day-sheet .calendar-day-tasks {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 46;
+    max-height: 64vh;
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 16px 16px 0 0;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -12px 32px rgba(0, 0, 0, .28);
+    padding: 6px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+  body.cal-mode.day-sheet .calendar-day-tasks::before {
+    content: "";
+    display: block;
+    width: 40px; height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin: 4px auto 10px;
+    flex: 0 0 auto;
+  }
+  body.cal-mode.day-sheet #calendar-day-title { font-size: 15px; }
+}
+
+/* время в панели дня не слипается с названием */
+.day-task-title .cal-chip-time {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}

@@ -72,6 +72,16 @@
       </nav>
 
       <div class="sidebar-scroll">
+        <div class="section cal-switch-section">
+          <div class="section-head"><span class="section-title">Вид календаря</span></div>
+          <div class="side-seg" id="side-cal-switch">
+            <button type="button" data-calview="day">День</button>
+            <button type="button" data-calview="3day">3 дня</button>
+            <button type="button" data-calview="week">Неделя</button>
+            <button type="button" data-calview="month">Месяц</button>
+          </div>
+        </div>
+
         <div class="section mini-cal-section">
           <div id="mini-cal"></div>
         </div>
@@ -170,6 +180,9 @@
         <section class="calendar-pane hidden" id="calendar-pane">
           <div class="calendar">
             <div class="calendar-head">
+              <button class="icon-btn cal-menu-btn" id="cal-menu-btn" aria-label="Открыть меню">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z" fill="currentColor"/></svg>
+              </button>
               <button class="icon-btn" id="cal-prev" aria-label="Назад"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" fill="currentColor"/></svg></button>
               <h2 id="cal-title">Январь 2025</h2>
               <button class="icon-btn" id="cal-next" aria-label="Вперёд"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" fill="currentColor"/></svg></button>
@@ -183,10 +196,14 @@
             </div>
             <div class="calendar-grid" id="calendar-grid"></div>
           </div>
+          <button class="cal-fab" id="cal-fab" aria-label="Добавить задачу">
+            <svg viewBox="0 0 24 24" width="26" height="26"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+          </button>
           <div class="calendar-day-tasks" id="calendar-day-tasks">
             <h3 id="calendar-day-title">Выберите день</h3>
             <div id="calendar-day-list"></div>
           </div>
+          <div class="sheet-backdrop" id="sheet-backdrop"></div>
         </section>
 
         <!-- Habits pane -->
